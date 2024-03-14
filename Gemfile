@@ -1,14 +1,14 @@
 require 'pathname'
 
-source :rubygems
+source 'https://rubygems.org'
 
 gemspec
 
 SOURCE         = ENV.fetch('SOURCE', :git).to_sym
-REPO_POSTFIX   = SOURCE == :path ? ''                                : '.git'
-DATAMAPPER     = SOURCE == :path ? Pathname(__FILE__).dirname.parent : 'http://github.com/datamapper'
-DM_VERSION     = '~> 1.3.0.beta'
-DO_VERSION     = '~> 0.10.6'
+REPO_POSTFIX   = (SOURCE == :path) ? ''                                : '.git'
+DATAMAPPER     = (SOURCE == :path) ? Pathname(__FILE__).dirname.parent : 'https://github.com/datamapper'
+DM_VERSION     = '~> 1.3.0.beta'.freeze
+DO_VERSION     = '~> 0.10.6'.freeze
 CURRENT_BRANCH = ENV.fetch('GIT_BRANCH', 'master')
 
 do_options = {}

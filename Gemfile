@@ -6,13 +6,13 @@ gemspec
 
 SOURCE         = ENV.fetch('SOURCE', :git).to_sym
 REPO_POSTFIX   = (SOURCE == :path) ? ''                                : '.git'
-DATAMAPPER     = (SOURCE == :path) ? Pathname(__FILE__).dirname.parent : 'https://github.com/datamapper'
+DATAMAPPER     = (SOURCE == :path) ? Pathname(__FILE__).dirname.parent : 'https://github.com/firespring'
 DM_VERSION     = '~> 1.3.0.beta'.freeze
 DO_VERSION     = '~> 0.10.6'.freeze
 CURRENT_BRANCH = ENV.fetch('GIT_BRANCH', 'master')
 
 do_options = {}
-do_options[:git] = "#{DATAMAPPER}/do#{REPO_POSTFIX}" if ENV['DO_GIT'] == 'true'
+do_options[:git] = "#{DATAMAPPER}/datamapper-do#{REPO_POSTFIX}" if ENV['DO_GIT'] == 'true'
 
 gem 'data_objects', DO_VERSION, do_options.dup
 gem 'dm-core', DM_VERSION,

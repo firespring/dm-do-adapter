@@ -1,12 +1,8 @@
-share_examples_for 'A DataObjects Adapter' do
+shared_examples 'A DataObjects Adapter' do
   before :all do
-    unless respond_to?(:adapter) 
-      raise '+adapter+ should be defined in a let(:adapter) block' 
-    end
+    raise '+adapter+ should be defined in a let(:adapter) block' unless respond_to?(:adapter)
 
-    unless respond_to?(:repository) 
-      raise '+repository+ should be defined in a let(:repository) block' 
-    end
+    raise '+repository+ should be defined in a let(:repository) block' unless respond_to?(:repository)
 
     @log = StringIO.new
 
@@ -18,10 +14,10 @@ share_examples_for 'A DataObjects Adapter' do
 
     @jruby = !!(RUBY_PLATFORM =~ /java/)
 
-    @postgres   = defined?(DataMapper::Adapters::PostgresAdapter)  && @adapter.kind_of?(DataMapper::Adapters::PostgresAdapter)
-    @mysql      = defined?(DataMapper::Adapters::MysqlAdapter)     && @adapter.kind_of?(DataMapper::Adapters::MysqlAdapter)
-    @sql_server = defined?(DataMapper::Adapters::SqlserverAdapter) && @adapter.kind_of?(DataMapper::Adapters::SqlserverAdapter)
-    @oracle     = defined?(DataMapper::Adapters::OracleAdapter)    && @adapter.kind_of?(DataMapper::Adapters::OracleAdapter)
+    @postgres   = defined?(DataMapper::Adapters::PostgresAdapter)  && @adapter.is_a?(DataMapper::Adapters::PostgresAdapter)
+    @mysql      = defined?(DataMapper::Adapters::MysqlAdapter)     && @adapter.is_a?(DataMapper::Adapters::MysqlAdapter)
+    @sql_server = defined?(DataMapper::Adapters::SqlserverAdapter) && @adapter.is_a?(DataMapper::Adapters::SqlserverAdapter)
+    @oracle     = defined?(DataMapper::Adapters::OracleAdapter)    && @adapter.is_a?(DataMapper::Adapters::OracleAdapter)
   end
 
   after :all do
@@ -96,7 +92,7 @@ share_examples_for 'A DataObjects Adapter' do
 
         reset_log
 
-        Article.create(:id => 1)
+        Article.create(id: 1)
       end
 
       it 'should not send NULL values' do
@@ -118,15 +114,15 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Article
         include DataMapper::Resource
 
-        property :name,   String, :key => true
-        property :author, String, :required => true
+        property :name,   String, key: true
+        property :author, String, required: true
 
         auto_migrate!
       end
 
       @article_model = Article
 
-      @article_model.create(:name => 'Learning DataMapper', :author => 'Dan Kubb')
+      @article_model.create(name: 'Learning DataMapper', author: 'Dan Kubb')
     end
 
     describe 'when one field specified in SELECT statement' do
@@ -143,7 +139,7 @@ share_examples_for 'A DataObjects Adapter' do
       end
 
       it 'should return an Array of values' do
-        @return.should == [ 'Learning DataMapper' ]
+        @return.should == ['Learning DataMapper']
       end
     end
 
@@ -165,7 +161,7 @@ share_examples_for 'A DataObjects Adapter' do
       end
 
       it 'should return expected values' do
-        @return.first.values.should == [ 'Learning DataMapper', 'Dan Kubb' ]
+        @return.first.values.should == ['Learning DataMapper', 'Dan Kubb']
       end
     end
   end
@@ -175,8 +171,8 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Article
         include DataMapper::Resource
 
-        property :name,   String, :key => true
-        property :author, String, :required => true
+        property :name,   String, key: true
+        property :author, String, required: true
 
         auto_migrate!
       end
@@ -208,11 +204,11 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Article
         include DataMapper::Resource
 
-        property :name, String, :key => true
-        property :description, String, :required => false
+        property :name, String, key: true
+        property :description, String, required: false
 
-        belongs_to :parent, self, :required => false
-        has n, :children, self, :inverse => :parent
+        belongs_to :parent, self, required: false
+        has n, :children, self, inverse: :parent
 
         auto_migrate!
       end
@@ -220,7 +216,7 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Publisher
         include DataMapper::Resource
 
-        property :name, String, :key => true
+        property :name, String, key: true
 
         auto_migrate!
       end
@@ -228,7 +224,7 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Author
         include DataMapper::Resource
 
-        property :name, String, :key => true
+        property :name, String, key: true
 
         belongs_to :article
         belongs_to :publisher
@@ -243,12 +239,12 @@ share_examples_for 'A DataObjects Adapter' do
 
     describe 'with a raw query' do
       before :all do
-        @article_model.create(:name => 'Test', :description => 'Description').should be_saved
-        @article_model.create(:name => 'NoDescription').should be_saved
+        @article_model.create(name: 'Test', description: 'Description').should be_saved
+        @article_model.create(name: 'NoDescription').should be_saved
 
-        @query = DataMapper::Query.new(repository, @article_model, :conditions => [ 'description IS NOT NULL' ])
+        @query = DataMapper::Query.new(repository, @article_model, conditions: ['description IS NOT NULL'])
 
-        @return = @adapter.read(@query)
+        @return = @adapter&.read(@query)
       end
 
       it 'should return an Array of Hashes' do
@@ -257,22 +253,22 @@ share_examples_for 'A DataObjects Adapter' do
       end
 
       it 'should return expected values' do
-        @return.should == [ { @article_model.properties[:name]        => 'Test',
-                              @article_model.properties[:description] => 'Description',
-                              @article_model.properties[:parent_name] => nil } ]
+        @return.should == [{@article_model.properties[:name] => 'Test',
+                            @article_model.properties[:description] => 'Description',
+                            @article_model.properties[:parent_name] => nil}]
       end
     end
 
     describe 'with a raw query with a bind value mismatch' do
       before :all do
-        @article_model.create(:name => 'Test').should be_saved
+        @article_model.create(name: 'Test').should be_saved
 
-        @query = DataMapper::Query.new(repository, @article_model, :conditions => [ 'name IS NOT NULL', nil ])
+        @query = DataMapper::Query.new(repository, @article_model, conditions: ['name IS NOT NULL', nil])
       end
 
       it 'should raise an error' do
         lambda {
-          @adapter.read(@query)
+          @adapter&.read(@query)
         }.should raise_error(ArgumentError, 'Binding mismatch: 1 for 0')
       end
     end
@@ -281,19 +277,19 @@ share_examples_for 'A DataObjects Adapter' do
       describe 'with an inclusion comparison' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            @article_model.create(name: "Test #{index}", parent: @article_model.last).should be_saved
           end
 
           @parents = @article_model.all
-          @query   = DataMapper::Query.new(repository, @article_model, :parent => @parents)
+          @query   = DataMapper::Query.new(repository, @article_model, parent: @parents)
 
-          @expected = @article_model.all[1, 4].map { |article| article.attributes(:property) }
+          @expected = @article_model.all[1, 4]&.map { |article| article.attributes(:property) }
         end
 
         describe 'that is not loaded' do
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
           it 'should return an Array of Hashes' do
@@ -319,7 +315,7 @@ share_examples_for 'A DataObjects Adapter' do
 
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
           it 'should return an Array of Hashes' do
@@ -340,7 +336,7 @@ share_examples_for 'A DataObjects Adapter' do
       describe 'with an negated inclusion comparison' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            @article_model.create(name: "Test #{index}", parent: @article_model.last).should be_saved
           end
 
           @parents = @article_model.all
@@ -352,7 +348,7 @@ share_examples_for 'A DataObjects Adapter' do
         describe 'that is not loaded' do
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
           it 'should return an Array of Hashes' do
@@ -378,7 +374,7 @@ share_examples_for 'A DataObjects Adapter' do
 
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
           it 'should return an Array of Hashes' do
@@ -399,31 +395,31 @@ share_examples_for 'A DataObjects Adapter' do
       context 'with an inclusion comparison of nil values' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            @article_model.create(name: "Test #{index}", parent: @article_model.last).should be_saved
           end
 
-          @query  = DataMapper::Query.new(repository, @article_model, :parent_name => [nil])
-          @return = @adapter.read(@query)
+          @query  = DataMapper::Query.new(repository, @article_model, parent_name: [nil])
+          @return = @adapter&.read(@query)
         end
 
         it 'should return records with matching values' do
-          @return.to_a.should == [ @article_model.first.attributes(:property) ]
+          @return.to_a.should == [@article_model.first&.attributes(:property)]
         end
       end
 
       context 'with an inclusion comparison of nil and actual values' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            @article_model.create(name: "Test #{index}", parent: @article_model.last).should be_saved
           end
 
           @last   = @article_model.last
-          @query  = DataMapper::Query.new(repository, @article_model, :parent_name => [nil, @last.parent.name])
-          @return = @adapter.read(@query)
+          @query  = DataMapper::Query.new(repository, @article_model, parent_name: [nil, @last.parent.name])
+          @return = @adapter&.read(@query)
         end
 
         it 'should return records with matching values' do
-          @return.to_a.should =~ [ @article_model.first.attributes(:property), @last.attributes(:property) ]
+          @return.to_a.should =~ [@article_model.first&.attributes(:property), @last.attributes(:property)]
         end
       end
     end
@@ -433,19 +429,19 @@ share_examples_for 'A DataObjects Adapter' do
 
       let(:article_name)   { 'DataMapper Rocks!'                                                    }
       let(:publisher_name) { 'Unbiased Press'                                                       }
-      let(:query)          { { 'article.name' => article_name, 'publisher.name' => publisher_name } }
+      let(:query)          { {'article.name' => article_name, 'publisher.name' => publisher_name} }
 
       before do
         @author = @author_model.first_or_create(
-          :name      => 'Dan Kubb',
-          :article   => { :name => article_name   },
-          :publisher => { :name => publisher_name }
+          name: 'Dan Kubb',
+          article: {name: article_name},
+          publisher: {name: publisher_name}
         )
       end
 
       specify { expect { subject }.to_not raise_error }
 
-      it { should == [ @author ] }
+      it { should == [@author] }
     end
   end
 end

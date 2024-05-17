@@ -22,8 +22,8 @@ else
 end
 
 group :development do
-  gem 'rake'
-  gem 'rspec'
+  gem 'rake', '~> 13.1'
+  gem 'rspec', '~> 3.13'
 end
 
 platforms :mri_18 do

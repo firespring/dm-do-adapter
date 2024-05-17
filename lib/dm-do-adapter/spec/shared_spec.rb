@@ -1,12 +1,8 @@
-share_examples_for 'A DataObjects Adapter' do
+shared_examples 'A DataObjects Adapter' do
   before :all do
-    unless respond_to?(:adapter) 
-      raise '+adapter+ should be defined in a let(:adapter) block' 
-    end
+    raise '+adapter+ should be defined in a let(:adapter) block' unless respond_to?(:adapter)
 
-    unless respond_to?(:repository) 
-      raise '+repository+ should be defined in a let(:repository) block' 
-    end
+    raise '+repository+ should be defined in a let(:repository) block' unless respond_to?(:repository)
 
     @log = StringIO.new
 
@@ -18,10 +14,10 @@ share_examples_for 'A DataObjects Adapter' do
 
     @jruby = !!(RUBY_PLATFORM =~ /java/)
 
-    @postgres   = defined?(DataMapper::Adapters::PostgresAdapter)  && @adapter.kind_of?(DataMapper::Adapters::PostgresAdapter)
-    @mysql      = defined?(DataMapper::Adapters::MysqlAdapter)     && @adapter.kind_of?(DataMapper::Adapters::MysqlAdapter)
-    @sql_server = defined?(DataMapper::Adapters::SqlserverAdapter) && @adapter.kind_of?(DataMapper::Adapters::SqlserverAdapter)
-    @oracle     = defined?(DataMapper::Adapters::OracleAdapter)    && @adapter.kind_of?(DataMapper::Adapters::OracleAdapter)
+    @postgres   = defined?(DataMapper::Adapters::PostgresAdapter)  && @adapter.is_a?(DataMapper::Adapters::PostgresAdapter)
+    @mysql      = defined?(DataMapper::Adapters::MysqlAdapter)     && @adapter.is_a?(DataMapper::Adapters::MysqlAdapter)
+    @sql_server = defined?(DataMapper::Adapters::SqlserverAdapter) && @adapter.is_a?(DataMapper::Adapters::SqlserverAdapter)
+    @oracle     = defined?(DataMapper::Adapters::OracleAdapter)    && @adapter.is_a?(DataMapper::Adapters::OracleAdapter)
   end
 
   after :all do
@@ -66,7 +62,7 @@ share_examples_for 'A DataObjects Adapter' do
         Article.create
       end
 
-      it 'should not send NULL values' do
+      it 'does not send NULL values' do
         statement = if @mysql
           /\AINSERT INTO `articles` \(\) VALUES \(\)\z/
         elsif @oracle
@@ -79,7 +75,7 @@ share_examples_for 'A DataObjects Adapter' do
           /\AINSERT INTO "articles" \(\) VALUES \(\)\z/
         end
 
-        log_output.first.should =~ statement
+        expect(log_output.first).to match statement
       end
     end
 
@@ -96,10 +92,10 @@ share_examples_for 'A DataObjects Adapter' do
 
         reset_log
 
-        Article.create(:id => 1)
+        Article.create(id: 1)
       end
 
-      it 'should not send NULL values' do
+      it 'does not send NULL values' do
         regexp = if @mysql
           /^INSERT INTO `articles` \(`id`\) VALUES \(.{1,2}\)$/i
         elsif @sql_server
@@ -108,7 +104,7 @@ share_examples_for 'A DataObjects Adapter' do
           /^INSERT INTO "articles" \("id"\) VALUES \(('.{1,2}'|.{1,2})\)$/i
         end
 
-        log_output.first.should =~ regexp
+        expect(log_output.first).to match regexp
       end
     end
   end
@@ -118,15 +114,15 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Article
         include DataMapper::Resource
 
-        property :name,   String, :key => true
-        property :author, String, :required => true
+        property :name,   String, key: true
+        property :author, String, required: true
 
         auto_migrate!
       end
 
       @article_model = Article
 
-      @article_model.create(:name => 'Learning DataMapper', :author => 'Dan Kubb')
+      @article_model.create(name: 'Learning DataMapper', author: 'Dan Kubb')
     end
 
     describe 'when one field specified in SELECT statement' do
@@ -134,16 +130,16 @@ share_examples_for 'A DataObjects Adapter' do
         @return = @adapter.select('SELECT name FROM articles')
       end
 
-      it 'should return an Array' do
-        @return.should be_kind_of(Array)
+      it 'returns an Array' do
+        expect(@return).to be_kind_of(Array)
       end
 
-      it 'should have a single result' do
-        @return.size.should == 1
+      it 'has a single result' do
+        expect(@return.size).to eq 1
       end
 
-      it 'should return an Array of values' do
-        @return.should == [ 'Learning DataMapper' ]
+      it 'returns an Array of values' do
+        expect(@return).to eq [ 'Learning DataMapper' ]
       end
     end
 
@@ -152,20 +148,20 @@ share_examples_for 'A DataObjects Adapter' do
         @return = @adapter.select('SELECT name, author FROM articles')
       end
 
-      it 'should return an Array' do
-        @return.should be_kind_of(Array)
+      it 'returns an Array' do
+        expect(@return).to be_kind_of(Array)
       end
 
-      it 'should have a single result' do
-        @return.size.should == 1
+      it 'has a single result' do
+        expect(@return.size).to eq 1
       end
 
-      it 'should return an Array of Struct objects' do
-        @return.first.should be_kind_of(Struct)
+      it 'returns an Array of Struct objects' do
+        expect(@return.first).to be_kind_of(Struct)
       end
 
-      it 'should return expected values' do
-        @return.first.values.should == [ 'Learning DataMapper', 'Dan Kubb' ]
+      it 'returns expected values' do
+        expect(@return.first.values).to eq [ 'Learning DataMapper', 'Dan Kubb' ]
       end
     end
   end
@@ -175,8 +171,8 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Article
         include DataMapper::Resource
 
-        property :name,   String, :key => true
-        property :author, String, :required => true
+        property :name,   String, key: true
+        property :author, String, required: true
 
         auto_migrate!
       end
@@ -188,18 +184,18 @@ share_examples_for 'A DataObjects Adapter' do
       @result = @adapter.execute('INSERT INTO articles (name, author) VALUES(?, ?)', 'Learning DataMapper', 'Dan Kubb')
     end
 
-    it 'should return a DataObjects::Result' do
-      @result.should be_kind_of(DataObjects::Result)
+    it 'returns a DataObjects::Result' do
+      expect(@result).to be_kind_of(DataObjects::Result)
     end
 
-    it 'should affect 1 row' do
-      @result.affected_rows.should == 1
+    it 'affects 1 row' do
+      expect(@result.affected_rows).to eq 1
     end
 
-    it 'should not have an insert_id' do
-      pending_if 'Inconsistent insert_id results', !(@postgres || @mysql || @oracle) do
-        @result.insert_id.should be_nil
-      end
+    it 'does not have an insert_id' do
+      pending 'Inconsistent insert_id results' unless @postgres || @mysql || @oracle
+
+      expect(@result.insert_id).to be_nil
     end
   end
 
@@ -208,11 +204,11 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Article
         include DataMapper::Resource
 
-        property :name, String, :key => true
-        property :description, String, :required => false
+        property :name, String, key: true
+        property :description, String, required: false
 
-        belongs_to :parent, self, :required => false
-        has n, :children, self, :inverse => :parent
+        belongs_to :parent, self, required: false
+        has n, :children, self, inverse: :parent
 
         auto_migrate!
       end
@@ -220,7 +216,7 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Publisher
         include DataMapper::Resource
 
-        property :name, String, :key => true
+        property :name, String, key: true
 
         auto_migrate!
       end
@@ -228,7 +224,7 @@ share_examples_for 'A DataObjects Adapter' do
       class ::Author
         include DataMapper::Resource
 
-        property :name, String, :key => true
+        property :name, String, key: true
 
         belongs_to :article
         belongs_to :publisher
@@ -243,21 +239,21 @@ share_examples_for 'A DataObjects Adapter' do
 
     describe 'with a raw query' do
       before :all do
-        @article_model.create(:name => 'Test', :description => 'Description').should be_saved
-        @article_model.create(:name => 'NoDescription').should be_saved
+        expect(@article_model.create(:name => 'Test', :description => 'Description')).to be_saved
+        expect(@article_model.create(:name => 'NoDescription')).to be_saved
 
-        @query = DataMapper::Query.new(repository, @article_model, :conditions => [ 'description IS NOT NULL' ])
+        @query = DataMapper::Query.new(repository, @article_model, conditions: ['description IS NOT NULL'])
 
-        @return = @adapter.read(@query)
+        @return = @adapter&.read(@query)
       end
 
-      it 'should return an Array of Hashes' do
-        @return.should be_kind_of(Array)
-        @return.all? { |entry| entry.should be_kind_of(Hash) }
+      it 'returns an Array of Hashes' do
+        expect(@return).to be_kind_of(Array)
+        @return.all? { |entry| expect(entry).to be_kind_of(Hash) }
       end
 
-      it 'should return expected values' do
-        @return.should == [ { @article_model.properties[:name]        => 'Test',
+      it 'returns expected values' do
+        expect(@return).to eq [ { @article_model.properties[:name]        => 'Test',
                               @article_model.properties[:description] => 'Description',
                               @article_model.properties[:parent_name] => nil } ]
       end
@@ -265,15 +261,13 @@ share_examples_for 'A DataObjects Adapter' do
 
     describe 'with a raw query with a bind value mismatch' do
       before :all do
-        @article_model.create(:name => 'Test').should be_saved
+        expect(@article_model.create(:name => 'Test')).to be_saved
 
-        @query = DataMapper::Query.new(repository, @article_model, :conditions => [ 'name IS NOT NULL', nil ])
+        @query = DataMapper::Query.new(repository, @article_model, conditions: ['name IS NOT NULL', nil])
       end
 
-      it 'should raise an error' do
-        lambda {
-          @adapter.read(@query)
-        }.should raise_error(ArgumentError, 'Binding mismatch: 1 for 0')
+      it 'raises an error' do
+        expect { @adapter.read(@query) }.to raise_error(ArgumentError, 'Binding mismatch: 1 for 0')
       end
     end
 
@@ -281,34 +275,34 @@ share_examples_for 'A DataObjects Adapter' do
       describe 'with an inclusion comparison' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            expect(@article_model.create(:name => "Test #{index}", :parent => @article_model.last)).to be_saved
           end
 
           @parents = @article_model.all
-          @query   = DataMapper::Query.new(repository, @article_model, :parent => @parents)
+          @query   = DataMapper::Query.new(repository, @article_model, parent: @parents)
 
-          @expected = @article_model.all[1, 4].map { |article| article.attributes(:property) }
+          @expected = @article_model.all[1, 4]&.map { |article| article.attributes(:property) }
         end
 
         describe 'that is not loaded' do
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
-          it 'should return an Array of Hashes' do
-            @return.should be_kind_of(Array)
-            @return.all? { |entry| entry.should be_kind_of(Hash) }
+          it 'returns an Array of Hashes' do
+            expect(@return).to be_kind_of(Array)
+            @return.all? { |entry| expect(entry).to be_kind_of(Hash) }
           end
 
-          it 'should return expected values' do
-            @return.should == @expected
+          it 'returns expected values' do
+            expect(@return).to eq @expected
           end
 
-          it 'should execute one subquery' do
-            pending_if @mysql do
-              log_output.size.should == 1
-            end
+          it 'executes one subquery' do
+            pending if @mysql
+
+            expect(log_output.size).to eq 1
           end
         end
 
@@ -319,20 +313,20 @@ share_examples_for 'A DataObjects Adapter' do
 
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
-          it 'should return an Array of Hashes' do
-            @return.should be_kind_of(Array)
-            @return.all? { |entry| entry.should be_kind_of(Hash) }
+          it 'returns an Array of Hashes' do
+            expect(@return).to be_kind_of(Array)
+            @return.all? { |entry| expect(entry).to be_kind_of(Hash) }
           end
 
-          it 'should return expected values' do
-            @return.should == @expected
+          it 'returns expected values' do
+            expect(@return).to eq @expected
           end
 
-          it 'should execute one query' do
-            log_output.size.should == 1
+          it 'executes one query' do
+            expect(log_output.size).to eq 1
           end
         end
       end
@@ -340,7 +334,7 @@ share_examples_for 'A DataObjects Adapter' do
       describe 'with an negated inclusion comparison' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            expect(@article_model.create(:name => "Test #{index}", :parent => @article_model.last)).to be_saved
           end
 
           @parents = @article_model.all
@@ -352,22 +346,22 @@ share_examples_for 'A DataObjects Adapter' do
         describe 'that is not loaded' do
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
-          it 'should return an Array of Hashes' do
-            @return.should be_kind_of(Array)
-            @return.all? { |entry| entry.should be_kind_of(Hash) }
+          it 'returns an Array of Hashes' do
+            expect(@return).to be_kind_of(Array)
+            @return.all? { |entry| expect(entry).to be_kind_of(Hash) }
           end
 
-          it 'should return expected values' do
-            @return.should == @expected
+          it 'returns expected values' do
+            expect(@return).to eq @expected
           end
 
-          it 'should execute one subquery' do
-            pending_if @mysql do
-              log_output.size.should == 1
-            end
+          it 'executes one subquery' do
+            pending if @mysql
+
+            expect(log_output.size).to eq 1
           end
         end
 
@@ -378,20 +372,20 @@ share_examples_for 'A DataObjects Adapter' do
 
           before :all do
             reset_log
-            @return = @adapter.read(@query)
+            @return = @adapter&.read(@query)
           end
 
-          it 'should return an Array of Hashes' do
-            @return.should be_kind_of(Array)
-            @return.all? { |entry| entry.should be_kind_of(Hash) }
+          it 'returns an Array of Hashes' do
+            expect(@return).to be_kind_of(Array)
+            @return.all? { |entry| expect(entry).to be_kind_of(Hash) }
           end
 
-          it 'should return expected values' do
-            @return.should == @expected
+          it 'returns expected values' do
+            expect(@return).to eq @expected
           end
 
-          it 'should execute one query' do
-            log_output.size.should == 1
+          it 'executes one query' do
+            expect(log_output.size).to eq 1
           end
         end
       end
@@ -399,31 +393,31 @@ share_examples_for 'A DataObjects Adapter' do
       context 'with an inclusion comparison of nil values' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            expect(@article_model.create(:name => "Test #{index}", :parent => @article_model.last)).to be_saved
           end
 
-          @query  = DataMapper::Query.new(repository, @article_model, :parent_name => [nil])
-          @return = @adapter.read(@query)
+          @query  = DataMapper::Query.new(repository, @article_model, parent_name: [nil])
+          @return = @adapter&.read(@query)
         end
 
-        it 'should return records with matching values' do
-          @return.to_a.should == [ @article_model.first.attributes(:property) ]
+        it 'returns records with matching values' do
+          expect(@return.to_a).to eq [ @article_model.first.attributes(:property) ]
         end
       end
 
       context 'with an inclusion comparison of nil and actual values' do
         before :all do
           5.times do |index|
-            @article_model.create(:name => "Test #{index}", :parent => @article_model.last).should be_saved
+            expect(@article_model.create(:name => "Test #{index}", :parent => @article_model.last)).to be_saved
           end
 
           @last   = @article_model.last
-          @query  = DataMapper::Query.new(repository, @article_model, :parent_name => [nil, @last.parent.name])
-          @return = @adapter.read(@query)
+          @query  = DataMapper::Query.new(repository, @article_model, parent_name: [nil, @last.parent.name])
+          @return = @adapter&.read(@query)
         end
 
-        it 'should return records with matching values' do
-          @return.to_a.should =~ [ @article_model.first.attributes(:property), @last.attributes(:property) ]
+        it 'returns records with matching values' do
+          expect(@return.to_a).to match [ @article_model.first.attributes(:property), @last.attributes(:property) ]
         end
       end
     end
@@ -433,19 +427,19 @@ share_examples_for 'A DataObjects Adapter' do
 
       let(:article_name)   { 'DataMapper Rocks!'                                                    }
       let(:publisher_name) { 'Unbiased Press'                                                       }
-      let(:query)          { { 'article.name' => article_name, 'publisher.name' => publisher_name } }
+      let(:query)          { {'article.name' => article_name, 'publisher.name' => publisher_name} }
 
       before do
         @author = @author_model.first_or_create(
-          :name      => 'Dan Kubb',
-          :article   => { :name => article_name   },
-          :publisher => { :name => publisher_name }
+          name: 'Dan Kubb',
+          article: {name: article_name},
+          publisher: {name: publisher_name}
         )
       end
 
       specify { expect { subject }.to_not raise_error }
 
-      it { should == [ @author ] }
+      it { is_expected.to eq [ @author ] }
     end
   end
 end

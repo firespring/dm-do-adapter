@@ -11,15 +11,17 @@ DM_VERSION     = '~> 1.3.0.beta'.freeze
 DO_VERSION     = '~> 0.10.17'.freeze
 CURRENT_BRANCH = ENV.fetch('GIT_BRANCH', 'master')
 
+options = {}
+options[:branch] = CURRENT_BRANCH unless SOURCE == :path
 do_options = {}
-do_options[:git] = "#{DATAMAPPER}/datamapper-do#{REPO_POSTFIX}" if ENV['DO_GIT'] == 'true'
-
-gem 'data_objects', DO_VERSION, do_options.dup
-if SOURCE == :path
-  gem 'dm-core', DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}"
-else
-  gem 'dm-core', DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}", branch: CURRENT_BRANCH
+if ENV['DO_GIT'] == 'true'
+  do_options = options.dup
+  do_options[SOURCE] = "#{DATAMAPPER}/datamapper-do#{REPO_POSTFIX}"
 end
+gem 'data_objects', DO_VERSION, do_options.dup
+
+options[SOURCE] = "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}"
+gem 'dm-core', DM_VERSION, options.dup
 
 group :development do
   gem 'rake', '~> 13.1'

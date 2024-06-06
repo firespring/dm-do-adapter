@@ -26,11 +26,11 @@ gem 'dm-core', DM_VERSION, options.dup
 group :development do
   gem 'rake', '~> 13.1'
   gem 'rspec', '~> 3.13'
+  gem 'simplecov'
 end
 
 platforms :mri_18 do
   group :quality do
-    gem 'rcov'
     gem 'yard'
     gem 'yardstick'
   end

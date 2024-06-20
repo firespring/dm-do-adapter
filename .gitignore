@@ -19,7 +19,7 @@ tmtags
 ## Rubinius
 *.rbc
 
-## Rubymine
+## RubyMine
 .idea/
 
 ## PROJECT::GENERAL

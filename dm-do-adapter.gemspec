@@ -16,6 +16,6 @@ Gem::Specification.new do |gem|
   gem.version       = DataMapper::DoAdapter::VERSION
   gem.required_ruby_version = '>= 2.7.8'
 
-  gem.add_runtime_dependency('data_objects', ['~> 0.10.6'])
+  gem.add_runtime_dependency('data_objects', ['~> 0.10.17'])
   gem.add_runtime_dependency('dm-core', ['~> 1.3.0.beta'])
 end

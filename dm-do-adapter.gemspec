@@ -1,8 +1,8 @@
 require File.expand_path('../lib/dm-do-adapter/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ['Dan Kubb']
-  gem.email         = ['dan.kubb@gmail.com']
+  gem.authors       = ['opensource_firespring']
+  gem.email         = ['opensource@firespring.com']
   gem.summary       = 'DataObjects Adapter for DataMapper'
   gem.description   = 'A unified Ruby API for popular databases.'
   gem.license = 'Nonstandard'

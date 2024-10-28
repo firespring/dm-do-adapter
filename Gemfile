@@ -18,10 +18,10 @@ if ENV['DO_GIT'] == 'true'
   do_options = options.dup
   do_options[SOURCE] = "#{DATAMAPPER}/datamapper-do#{REPO_POSTFIX}"
 end
-gem 'data_objects', DO_VERSION, do_options.dup
+gem 'sbf-data_objects', DO_VERSION, do_options.dup
 
 options[SOURCE] = "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}"
-gem 'dm-core', DM_VERSION, options.dup
+gem 'sbf-dm-core', DM_VERSION, options.dup
 
 group :development do
   gem 'pry'

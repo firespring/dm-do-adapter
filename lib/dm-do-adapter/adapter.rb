@@ -318,9 +318,9 @@ module DataMapper
           column_name = ''
 
           case qualify
-            when true
+          when true
               column_name << "#{quote_name(property.model.storage_name(name))}."
-            when String
+          when String
               column_name << "#{quote_name(qualify)}."
           end
 
@@ -475,7 +475,7 @@ module DataMapper
         #
         # @api private
         def columns_statement(properties, qualify)
-          properties.map { |property| property_to_column_name(property, qualify) }.join(', ')
+          properties.map { |property| chainable_property_to_column_name(property, qualify) }.join(', ')
         end
 
         # Constructs joins clause

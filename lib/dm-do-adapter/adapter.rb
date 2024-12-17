@@ -475,7 +475,7 @@ module DataMapper
         #
         # @api private
         def columns_statement(properties, qualify)
-          properties.map { |property| chainable_property_to_column_name(property, qualify) }.join(', ')
+          properties.map { |property| property_to_column_name(property, qualify) }.join(', ')
         end
 
         # Constructs joins clause

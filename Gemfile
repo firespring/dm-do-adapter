@@ -7,7 +7,7 @@ gemspec
 SOURCE         = ENV.fetch('SOURCE', :git).to_sym
 REPO_POSTFIX   = (SOURCE == :path) ? '' : '.git'
 DATAMAPPER     = (SOURCE == :path) ? Pathname(__FILE__).dirname.parent : 'https://github.com/firespring'
-DM_VERSION     = '~> 1.3.0'.freeze
+DM_VERSION     = '~> 1.3'.freeze
 DO_VERSION     = '~> 0.11.0'.freeze
 CURRENT_BRANCH = ENV.fetch('GIT_BRANCH', 'master')
 

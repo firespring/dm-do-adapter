@@ -318,9 +318,9 @@ module DataMapper
           column_name = ''
 
           case qualify
-            when true
+          when true
               column_name << "#{quote_name(property.model.storage_name(name))}."
-            when String
+          when String
               column_name << "#{quote_name(qualify)}."
           end
 

@@ -243,7 +243,7 @@ module DataMapper
           end
       end
 
-      chainable do
+      module Connection
         protected
 
         # Instantiates new connection object
@@ -787,11 +787,15 @@ module DataMapper
         end
 
       end
-
-      include SQL
-
     end
 
     const_added(:DataObjectsAdapter)
   end
 end
+
+# In Ruby 2, Connection and SQL were being added to DataMapper::Adapters::DataObjectsAdapter's ancestors
+# directly after AbstractAdapter.  In Ruby 3 (due to changes in `include` behavior of modules),
+# they were ending up in the wrong spot at the top of DataObjectsAdapter's ancestors.
+# prepend'ing them to AbstractAdapter gets us the correct ancestor chain.
+DataMapper::Adapters::AbstractAdapter.prepend(DataMapper::Adapters::DataObjectsAdapter::Connection)
+DataMapper::Adapters::AbstractAdapter.prepend(DataMapper::Adapters::DataObjectsAdapter::SQL)
